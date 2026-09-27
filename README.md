@@ -1,10 +1,11 @@
 
 # VideoITG: Multimodal Video Understanding with Instructed Temporal Grounding
 
-While Video Large Language Models (Video-LLMs) have shown significant potential in multimodal understanding and reasoning tasks, efficiently selecting the most informative frames from videos remains a critical challenge. To address this, **Instructed Temporal Grounding for Videos (VideoITG)** provides a framework that adaptively customizes frame sampling strategies based on user instructions.
+![Teaser Diagram](assets/teaser.png)
+
+While Video Large Language Models (Video-LLMs) have shown significant potential in multimodal understanding and reasoning tasks, efficiently selecting the most informative frames from videos remains a critical challenge. To address this, **Instructed Temporal Grounding for Videos (VideoITG)** provides a framework that adaptively customizes frame sampling strategies based on user instructions. 
 
 VideoITG is supported by **VidThinker**, an automated annotation pipeline that:
-
 1. Generates instruction-conditioned clip captions.
 2. Retrieves relevant video segments with instruction-guided reasoning.
 3. Performs fine-grained frame localization.
@@ -14,24 +15,23 @@ Using VidThinker, the **VideoITG-40K** dataset was built with **40K videos and 5
 ---
 
 ## Contents
-
-* [Overview & Architecture](https://www.google.com/search?q=%2523overview--architecture&utm_source=gemini)
-* [Performance Benchmarks](https://www.google.com/search?q=%2523performance-benchmarks&utm_source=gemini)
-* [Visual Examples](https://www.google.com/search?q=%2523visual-examples&utm_source=gemini)
-* [Inference](https://www.google.com/search?q=%2523inference&utm_source=gemini)
-* [Installation](https://www.google.com/search?q=%2523installation&utm_source=gemini)
-* [Training Data](https://www.google.com/search?q=%2523training-data&utm_source=gemini)
-* [Checkpoint Preparation](https://www.google.com/search?q=%2523checkpoint-preparation&utm_source=gemini)
-* [Training](https://www.google.com/search?q=%2523training&utm_source=gemini)
-* [Evaluation](https://www.google.com/search?q=%2523evaluation&utm_source=gemini)
-* [License & Terms of Use](https://www.google.com/search?q=%2523license--terms-of-use&utm_source=gemini)
-* [Acknowledgements](https://www.google.com/search?q=%2523acknowledgement&utm_source=gemini)
+- [Overview & Architecture](#overview--architecture)
+- [Performance Benchmarks](#performance-benchmarks)
+- [Visual Examples](#visual-examples)
+- [Inference](#inference)
+- [Installation](#installation)
+- [Training Data](#training-data)
+- [Checkpoint Preparation](#checkpoint-preparation)
+- [Training](#training)
+- [Evaluation](#evaluation)
+- [License & Terms of Use](#license--terms-of-use)
+- [Acknowledgements](#acknowledgement)
 
 ---
 
 ## Overview & Architecture
 
-VideoITG acts as a high-precision, instruction-aware frame selector before passing visual data into heavy downstream Video-LLMs.
+VideoITG acts as a high-precision, instruction-aware frame selector before passing visual data into heavy downstream Video-LLMs. 
 
 1. **Dense Frame Sampling**: Decodes video streams into an initial sequence of frames (e.g., 512 frames at 1 FPS).
 2. **Instruction-Guided Scoring**: A score head evaluates each frame's relevance relative to the specific user query or task instruction using a sigmoid output.
@@ -45,7 +45,7 @@ VideoITG acts as a high-precision, instruction-aware frame selector before passi
 Below is a comparison between baseline uniform frame sampling (`UNI-32`) and VideoITG-selected sampling (`ITG-32`) across standard evaluation benchmarks:
 
 | Downstream Video-LLM | Selection Strategy | LongVideoBench | MLVU | VideoMME-S | VideoMME-M | VideoMME-L | CG-Bench (mini) | Average |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
 | **InternVL2.5-8B** | UNI-32 | 58.3 | 66.4 | 75.1 | 61.7 | 53.1 | 37.7 | 58.7 |
 | **InternVL2.5-8B** | ITG-32 | **61.9** (+3.6) | **75.0** (+8.6) | **78.0** (+2.9) | **67.1** (+5.4) | **56.9** (+3.8) | **46.7** (+9.0) | **64.3** (+5.6) |
 | **InternVL2.5-26B** | UNI-32 | 55.6 | 71.3 | 78.1 | 67.1 | 56.9 | 40.6 | 61.6 |
@@ -63,43 +63,41 @@ Below is a comparison between baseline uniform frame sampling (`UNI-32`) and Vid
 
 ## Visual Examples
 
+![Visual QA Example 1](assets/VQA1.png)
+
+![Visual QA Example 2](assets/VQA2.png)
+
 ---
 
 ## Inference
 
 ### Checkpoints
-
-* **VideoITG Checkpoint (Top‑K selector)**: [`nvidia/VideoITG-8B`](https://huggingface.co/nvidia/VideoITG-8B?utm_source=gemini)
+- **VideoITG Checkpoint (Top‑K selector)**: [`nvidia/VideoITG-8B`](https://huggingface.co/nvidia/VideoITG-8B)
 
 ### How Frame Selection Works (512 $\rightarrow$ Sort $\rightarrow$ Top‑K)
-
 1. **Sampling**: The selector scores **512 uniformly sampled frames** (default setting) using a sigmoid scoring head.
 2. **Ranking**: Frames are sorted by score in **descending order**.
 3. **Filtering & Chronological Reordering**: The Top‑K highest-scoring frames are selected and re-sorted in **ascending chronological order** before being passed into the downstream Video-LLM.
 
-Refer to the reference implementation in [`infer.py`](https://www.google.com/search?q=infer.py&utm_source=gemini) for direct usage.
+Refer to the reference implementation in [`infer.py`](infer.py) for direct usage.
 
 ### JSONL Schema Explained
-
 The pipeline utilizes two structured JSONL file types:
 
 1. **Grounding Output (`results.jsonl`)**
-* Output from running `--model videoitg`.
-* Default path: `${output_dir}/results.jsonl`.
-* Contains frame indices sorted by score in **descending** order alongside their unnormalized logits:
-
-
-```json
-{
-  "doc_id": 12,
-  "video_path": "/path/to/video.mp4",
-  "contexts": "Instruction or prompt text...",
-  "index": [120, 60, 180],
-  "logits": [0.98, 0.97, 0.95]
-}
+   - Output from running `--model videoitg`.
+   - Default path: `${output_dir}/results.jsonl`.
+   - Contains frame indices sorted by score in **descending** order alongside their unnormalized logits:
+   ```json
+   {
+     "doc_id": 12,
+     "video_path": "/path/to/video.mp4",
+     "contexts": "Instruction or prompt text...",
+     "index": [120, 60, 180],
+     "logits": [0.98, 0.97, 0.95]
+   }
 
 ```
-
 
 2. **Downstream Selection File (`frame_indices_jsonl`)**
 * Consumed by downstream models (InternVL, Qwen3-VL, Eagle).
@@ -124,7 +122,7 @@ The pipeline utilizes two structured JSONL file types:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/NVlabs/VideoITG.git
+git clone [https://github.com/NVlabs/VideoITG.git](https://github.com/NVlabs/VideoITG.git)
 cd VideoITG
 
 # 2. Create and activate Conda environment
@@ -231,3 +229,7 @@ bash scripts/eval_lmms_eval/internvl2.5.sh
 * [EAGLE](https://github.com/NVlabs/EAGLE?utm_source=gemini): Base codebase and architecture frameworks.
 * [LMMs-Eval](https://github.com/EvolvingLMMs-Lab/lmms-eval?utm_source=gemini): Standardized evaluation tools and bench harnesses.
 * [LLaVA-OneVision](https://huggingface.co/datasets/lmms-lab/LLaVA-OneVision-Data?utm_source=gemini) & [LLaVA-Video](https://huggingface.co/datasets/lmms-lab/LLaVA-Video-178K?utm_source=gemini): Open datasets enabling multimodal training.
+
+```
+
+```
