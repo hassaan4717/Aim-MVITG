@@ -1,16 +1,16 @@
 
-# VideoITG: Multimodal Video Understanding with Instructed Temporal Grounding
+# Aim-MVITG: Multimodal Video Understanding with Instructed Temporal Grounding
 
 ![Teaser Diagram](assets/teaser.png)
 
-While Video Large Language Models (Video-LLMs) have shown significant potential in multimodal understanding and reasoning tasks, efficiently selecting the most informative frames from videos remains a critical challenge. To address this, **Instructed Temporal Grounding for Videos (VideoITG)** provides a framework that adaptively customizes frame sampling strategies based on user instructions. 
+While Video Large Language Models (Video-LLMs) have shown significant potential in multimodal understanding and reasoning tasks, efficiently selecting the most informative frames from videos remains a critical challenge. To address this, **Instructed Temporal Grounding for Videos (Aim-MVITG)** provides a framework that adaptively customizes frame sampling strategies based on user instructions. 
 
-VideoITG is supported by **VidThinker**, an automated annotation pipeline that:
+Aim-MVITG is supported by **VidThinker**, an automated annotation pipeline that:
 1. Generates instruction-conditioned clip captions.
 2. Retrieves relevant video segments with instruction-guided reasoning.
 3. Performs fine-grained frame localization.
 
-Using VidThinker, the **VideoITG-40K** dataset was built with **40K videos and 500K temporal grounding annotations**. The plug-and-play VideoITG model leverages visual-language alignment and reasoning for discriminative frame selection, consistently improving downstream video LLM performance across multiple multimodal video understanding benchmarks.
+Using VidThinker, the **Aim-MVITG-40K** dataset was built with **40K videos and 500K temporal grounding annotations**. The plug-and-play Aim-MVITG model leverages visual-language alignment and reasoning for discriminative frame selection, consistently improving downstream video LLM performance across multiple multimodal video understanding benchmarks.
 
 ---
 
@@ -31,7 +31,7 @@ Using VidThinker, the **VideoITG-40K** dataset was built with **40K videos and 5
 
 ## Overview & Architecture
 
-VideoITG acts as a high-precision, instruction-aware frame selector before passing visual data into heavy downstream Video-LLMs. 
+Aim-MVITG acts as a high-precision, instruction-aware frame selector before passing visual data into heavy downstream Video-LLMs. 
 
 1. **Dense Frame Sampling**: Decodes video streams into an initial sequence of frames (e.g., 512 frames at 1 FPS).
 2. **Instruction-Guided Scoring**: A score head evaluates each frame's relevance relative to the specific user query or task instruction using a sigmoid output.
@@ -42,7 +42,7 @@ VideoITG acts as a high-precision, instruction-aware frame selector before passi
 
 ## Performance Benchmarks
 
-Below is a comparison between baseline uniform frame sampling (`UNI-32`) and VideoITG-selected sampling (`ITG-32`) across standard evaluation benchmarks:
+Below is a comparison between baseline uniform frame sampling (`UNI-32`) and Aim-MVITG-selected sampling (`ITG-32`) across standard evaluation benchmarks:
 
 | Downstream Video-LLM | Selection Strategy | LongVideoBench | MLVU | VideoMME-S | VideoMME-M | VideoMME-L | CG-Bench (mini) | Average |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -72,7 +72,7 @@ Below is a comparison between baseline uniform frame sampling (`UNI-32`) and Vid
 ## Inference
 
 ### Checkpoints
-- **VideoITG Checkpoint (Top‑K selector)**: [`nvidia/VideoITG-8B`](https://huggingface.co/nvidia/VideoITG-8B)
+- **Aim-MVITG Checkpoint (Top‑K selector)**: [`nvidia/Aim-MVITG-8B`](https://huggingface.co/nvidia/Aim-MVITG-8B)
 
 ### How Frame Selection Works (512 $\rightarrow$ Sort $\rightarrow$ Top‑K)
 1. **Sampling**: The selector scores **512 uniformly sampled frames** (default setting) using a sigmoid scoring head.
@@ -85,7 +85,7 @@ Refer to the reference implementation in [`infer.py`](infer.py) for direct usage
 The pipeline utilizes two structured JSONL file types:
 
 1. **Grounding Output (`results.jsonl`)**
-   - Output from running `--model videoitg`.
+   - Output from running `--model Aim-MVITG`.
    - Default path: `${output_dir}/results.jsonl`.
    - Contains frame indices sorted by score in **descending** order alongside their unnormalized logits:
    ```json
@@ -122,12 +122,12 @@ The pipeline utilizes two structured JSONL file types:
 
 ```bash
 # 1. Clone the repository
-git clone [https://github.com/NVlabs/VideoITG.git](https://github.com/NVlabs/VideoITG.git)
-cd VideoITG
+git clone [https://github.com/NVlabs/Aim-MVITG.git](https://github.com/NVlabs/Aim-MVITG.git)
+cd Aim-MVITG
 
 # 2. Create and activate Conda environment
-conda create -n videoitg python=3.12 -y
-conda activate videoitg
+conda create -n Aim-MVITG python=3.12 -y
+conda activate Aim-MVITG
 
 # 3. Upgrade pip and install core dependencies
 pip install --upgrade pip
@@ -143,7 +143,7 @@ pip install flash-attn==2.4.2 --no-build-isolation
 ## Training Data
 
 * **Pretraining & Instruction Tuning Data**: Built on standard multimodal datasets, including [CC3M Pretrain 595K](https://huggingface.co/datasets/liuhaotian/LLaVA-CC3M-Pretrain-595K?utm_source=gemini), [LLaVA-OneVision](https://huggingface.co/datasets/lmms-lab/LLaVA-OneVision-Data?utm_source=gemini), and [LLaVA-Video 178K](https://huggingface.co/datasets/lmms-lab/LLaVA-Video-178K?utm_source=gemini).
-* **Grounding Dataset**: [VideoITG-40K Dataset](https://huggingface.co/datasets/NVEagle/VideoITG-40K?utm_source=gemini) containing 40,000 videos and 500,000 fine-grained temporal grounding annotations.
+* **Grounding Dataset**: [Aim-MVITG-40K Dataset](https://huggingface.co/datasets/NVEagle/Aim-MVITG-40K?utm_source=gemini) containing 40,000 videos and 500,000 fine-grained temporal grounding annotations.
 
 ---
 
@@ -160,7 +160,7 @@ Pretrained base models and fine-tuned Video-LLM weights can be fetched directly 
 To launch the grounding fine-tuning procedure:
 
 ```bash
-bash scripts/videoitg/finetune-uni-64frame-qwen2-7b-grounding.sh finetune 16
+bash scripts/Aim-MVITG/finetune-uni-64frame-qwen2-7b-grounding.sh finetune 16
 
 ```
 
@@ -175,7 +175,7 @@ bash scripts/videoitg/finetune-uni-64frame-qwen2-7b-grounding.sh finetune 16
 
 Evaluation pipeline utilizes `lmms_eval` integrated with `accelerate`.
 
-### Step 1: Run VideoITG Grounding Stage
+### Step 1: Run Aim-MVITG Grounding Stage
 
 Generate score predictions across the target benchmark dataset:
 
@@ -200,7 +200,7 @@ bash scripts/eval_lmms_eval/internvl2.5.sh
 ### Script Arguments
 
 * `--tasks`: Target benchmark (e.g., `videomme`, `mlvu`, `longvideobench_val_v`, `cgbench_subtitles`).
-* `--model`: Backend architecture identifier (`videoitg`, `internvl2`, `internvl3_5`, `qwen3_vl`, `eagle2_5`).
+* `--model`: Backend architecture identifier (`Aim-MVITG`, `internvl2`, `internvl3_5`, `qwen3_vl`, `eagle2_5`).
 * `--model_args`:
 * `pretrained`: HuggingFace checkpoint repository or local path.
 * `num_frames`: Number of frames uniformly sampled prior to scoring (e.g., `512`).
