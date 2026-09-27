@@ -214,11 +214,8 @@ bash scripts/eval_lmms_eval/internvl2.5.sh
 
 ## License & Terms of Use
 
-* Code is distributed under the [Apache 2.0 License](https://www.google.com/search?q=LICENSE&utm_source=gemini).
-* Portions adapted from `lmms-eval` retain their original software licenses.
-* Model weights are provided under the [NVIDIA Model License](https://www.google.com/search?q=LICENSE_Model&utm_source=gemini) for non-commercial research purposes.
-* Base Language Model: [Qwen2-7B-Instruct (Apache 2.0)](https://huggingface.co/Qwen/Qwen2-7B-Instruct/blob/main/LICENSE?utm_source=gemini)
-* Vision Encoder: [SigLIP (Apache 2.0)](https://huggingface.co/google/siglip-so400m-patch14-384?utm_source=gemini)
+* Base Language Model: [Qwen2-7B-Instruct (Apache 2.0)](https://huggingface.co/Qwen/Qwen2-7B-Instruct/blob/main/LICENSE)
+* Vision Encoder: [SigLIP (Apache 2.0)](https://huggingface.co/google/siglip-so400m-patch14-384)
 
 
 
