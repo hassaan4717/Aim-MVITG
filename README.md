@@ -136,4 +136,4 @@ The script uses SLURM environment variables and launches eight processes per nod
 
 ## License
 
-The repository code is provided under the Apache License 2.0; see [LICENSE](LICENSE). The model weights are subject to the NVIDIA License in [LICENSE_Model](LICENSE_Model), which limits use to non-commercial research or evaluation. Third-party components, datasets, and model checkpoints may carry additional terms; review their licenses before use.
+The model weights are subject to the NVIDIA License in [LICENSE_Model](LICENSE_Model), which limits use to non-commercial research or evaluation. Third-party components, datasets, and model checkpoints may carry additional terms; review their licenses before use.
